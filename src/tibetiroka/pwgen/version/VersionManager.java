@@ -27,7 +27,7 @@ public class VersionManager {
 	}
 	
 	public enum GeneratorVersion {
-		ALPHA(PasswordGenerator_ALPHA.class), BETA(PasswordGenerator_BETA.class);
+		ALPHA(PasswordGenerator_ALPHA.class), BETA(PasswordGenerator_BETA.class), GAMMA(PasswordGenerator_GAMMA.class);
 		private final Class<? extends PasswordGenerator> genClass;
 		
 		GeneratorVersion(Class<? extends PasswordGenerator> c) {
