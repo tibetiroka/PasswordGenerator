@@ -1,2 +1,13 @@
 # Project exclude paths
 /out/
+/target/
+/public_low.x509
+/public_medium.x509
+/public_high.x509
+/public_overkill.x509
+/public_crazy.x509
+/hashes_low.dat
+/hashes_medium.x509
+/hashes_high.dat
+/hashes_overkill.dat
+/hashes_crazy.dat
