@@ -32,6 +32,18 @@ public class Configuration {
 	@Setter
 	private static boolean safeConsole = System.console() != null;
 	/**
+	 * Whether the username is considered sensitive input. If it is sensitive, the password input method is used.
+	 */
+	@Getter
+	@Setter
+	private static boolean usernameSensitive = false;
+	/**
+	 * Whether the site's name is considered sensitive input. If it is sensitive, the password input method is used.
+	 */
+	@Getter
+	@Setter
+	private static boolean siteSensitive = false;
+	/**
 	 * Whether to copy the created password to the clipboard when it is generated
 	 */
 	@Getter

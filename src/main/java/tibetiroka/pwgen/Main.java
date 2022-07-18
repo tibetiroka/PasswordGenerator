@@ -32,6 +32,8 @@ public class Main {
 					case "pwgen.config.hashSecurity" -> Configuration.setHashSecurity(SecurityLevel.valueOf(parts[1]));
 					case "pwgen.config.useHashStorage" -> Configuration.setUseHashStorage(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.forceSafeConsole" -> Configuration.setForceSafeConsole(Boolean.parseBoolean(parts[1]));
+					case "pwgen.config.usernameSensitive" -> Configuration.setUsernameSensitive(Boolean.parseBoolean(parts[1]));
+					case "pwgen.config.siteSensitive" -> Configuration.setSiteSensitive(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.isSafeConsole" -> Configuration.setSafeConsole(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.copyPasswordToClipboard" -> Configuration.setCopyPasswordToClipboard(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.echoPassword" -> Configuration.setEchoPassword(Boolean.parseBoolean(parts[1]));
@@ -58,7 +60,6 @@ public class Main {
 	 * @throws Exception If the password cannot be generated
 	 */
 	public static void generate(PasswordGenerator generator, byte[] site, byte[] username, byte[] password) throws Exception {
-		checkConsole();
 		if((!Configuration.isCopyPasswordToClipboard()) && (!Configuration.isEchoPassword())) {
 			System.out.println("All password output forms are turned off, aborting");
 			System.exit(0);
@@ -83,10 +84,10 @@ public class Main {
 		}
 		//
 		if(site == null) {
-			site = PasswordGenerator.secureRandomBytes(promptInput("Please name the site or application"), 256);
+			site = PasswordGenerator.secureRandomBytes(prompt("Please name the site or application", Configuration.isSiteSensitive()), 256);
 		}
 		if(username == null) {
-			username = PasswordGenerator.secureRandomBytes(promptInput("Please choose your preferred username:"), 256);
+			username = PasswordGenerator.secureRandomBytes(prompt("Please choose your preferred username:", Configuration.isUsernameSensitive()), 256);
 		}
 		if(password == null) {
 			password = PasswordGenerator.secureRandomBytes(promptPassword("Please type in your personal secret code:"), 256);
@@ -151,6 +152,22 @@ public class Main {
 	}
 	
 	/**
+	 * Prompts for input based on the provided condition. If {@code password} is true, the password input is used. Otherwise, the standard input is used for the prompt.
+	 *
+	 * @param prompt   The prompting text
+	 * @param password Whether the input is a password
+	 * @return The input
+	 * @throws IOException If {@link #promptPassword(String)} cannot be performed
+	 */
+	private static @NonNull byte[] prompt(@NonNull String prompt, boolean password) throws IOException {
+		if(password) {
+			return promptPassword(prompt);
+		} else {
+			return promptInput(prompt);
+		}
+	}
+	
+	/**
 	 * Prompts for single-line input
 	 *
 	 * @param prompt The prompt
@@ -169,6 +186,7 @@ public class Main {
 	 * @return The input
 	 */
 	private static @NonNull byte[] promptPassword(@NonNull String prompt) throws IOException {
+		checkConsole();
 		System.out.println(prompt);
 		if(Configuration.isSafeConsole()) {
 			return ArrayUtils.toByteArray(System.console().readPassword());
