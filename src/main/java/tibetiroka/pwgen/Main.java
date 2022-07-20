@@ -12,6 +12,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
@@ -25,11 +26,30 @@ public class Main {
 		byte[] site = null;
 		byte[] username = null;
 		byte[] password = null;
+		argLoop:
 		for(String arg : args) {
 			String[] parts = arg.split("=");
 			try {
 				switch(parts[0]) {
-					case "pwgen.config.hashSecurity" -> Configuration.setHashSecurity(SecurityLevel.valueOf(parts[1]));
+					case "pwgen.config.hashSecurity" -> {
+						String s = parts[1].toUpperCase();
+						if(s.startsWith("HighestExisting".toUpperCase())) {
+							for(int i = SecurityLevel.values().length - 1; i >= 0; i--) {
+								File keyFile = new File("public_" + Configuration.getHashSecurity().name().toLowerCase() + ".x509");
+								if(keyFile.exists()) {
+									Configuration.setHashSecurity(SecurityLevel.values()[i]);
+									continue argLoop;
+								}
+							}
+							String s2 = s.substring("HighestExisting".length());
+							if(s2.startsWith("Or".toUpperCase())) {
+								s2 = s2.substring("Or".length());
+								Configuration.setHashSecurity(SecurityLevel.valueOf(s2));
+							}
+						} else {
+							Configuration.setHashSecurity(SecurityLevel.valueOf(s));
+						}
+					}
 					case "pwgen.config.useHashStorage" -> Configuration.setUseHashStorage(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.forceSafeConsole" -> Configuration.setForceSafeConsole(Boolean.parseBoolean(parts[1]));
 					case "pwgen.config.usernameSensitive" -> Configuration.setUsernameSensitive(Boolean.parseBoolean(parts[1]));
