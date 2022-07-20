@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -70,17 +69,18 @@ public class CredentialManager {
 			System.out.println("Generating encryption key for hash storage." + switch(Configuration.getHashSecurity()) {
 				case LOW -> "";
 				case MEDIUM -> " This might take some time.";
-				case HIGH -> " This might take up to 30 minutes on low-end computers, or up to 5 minutes on high-end ones.";
-				case OVERKILL -> "This might take days in your current configuration. It is recommended to downgrade your security level or use an externally generated key.";
+				case HIGH -> " This might take up to 30 minutes depending on your hardware.";
+				case OVERKILL -> "This might take hours in your current configuration. It is recommended to downgrade your security level or use an externally generated key.";
 				case CRAZY -> "You do you, buddy.";
 			});
+			System.out.println("This action is only performed once, unless you change your configuration.");
 			KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
 			generator.initialize(Configuration.getHashSecurity().getRsaKeySize());
-			KeyPair pair = generator.generateKeyPair();
-			Files.write(keyFile.toPath(), pair.getPublic().getEncoded(), StandardOpenOption.CREATE_NEW);
+			PublicKey key = generator.generateKeyPair().getPublic();
+			Files.write(keyFile.toPath(), key.getEncoded(), StandardOpenOption.CREATE_NEW);
 			getHashFile().createNewFile();
-			return pair.getPublic();
-		} catch(NoSuchAlgorithmException | IOException | NoSuchProviderException e) {
+			return key;
+		} catch(IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new RuntimeException(e);
 		}
 	}
