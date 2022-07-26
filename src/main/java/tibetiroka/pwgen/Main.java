@@ -35,9 +35,10 @@ public class Main {
 						String s = parts[1].toUpperCase();
 						if(s.startsWith("HighestExisting".toUpperCase())) {
 							for(int i = SecurityLevel.values().length - 1; i >= 0; i--) {
-								File keyFile = new File("public_" + Configuration.getHashSecurity().name().toLowerCase() + ".x509");
+								SecurityLevel level = SecurityLevel.values()[i];
+								File keyFile = new File("public_" + level.name().toLowerCase() + ".x509");
 								if(keyFile.exists()) {
-									Configuration.setHashSecurity(SecurityLevel.values()[i]);
+									Configuration.setHashSecurity(level);
 									continue argLoop;
 								}
 							}
